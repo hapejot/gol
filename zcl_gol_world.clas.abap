@@ -3,7 +3,7 @@ CLASS zcl_gol_world DEFINITION
   FINAL
   CREATE PUBLIC .
   PUBLIC SECTION.
-    INTERFACES zif_gol_world.
+    INTERFACES: zif_gol_world.
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES:
@@ -18,13 +18,16 @@ ENDCLASS.
 
 
 
-CLASS zcl_gol_world IMPLEMENTATION.
+CLASS ZCL_GOL_WORLD IMPLEMENTATION.
+
 
   METHOD zif_gol_world~clone.
 
-    r_result = NEW zcl_gol_world( ).
+    "    r_result = CAST zif_gol_world( me->if_os_clone~clone( ) ).
+    SYSTEM-CALL OBJMGR CLONE me TO r_result.
 
   ENDMETHOD.
+
 
   METHOD zif_gol_world~get_neighbours.
     DATA: ls_state LIKE LINE OF mt_state.
@@ -43,6 +46,7 @@ CLASS zcl_gol_world IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD zif_gol_world~get_state.
 
     r_result = COND #(  WHEN line_exists( mt_state[ x = x y = y ] )
@@ -50,6 +54,7 @@ CLASS zcl_gol_world IMPLEMENTATION.
                         ELSE zif_gol_world=>c_dead ).
 
   ENDMETHOD.
+
 
   METHOD zif_gol_world~set_state.
 
@@ -61,5 +66,4 @@ CLASS zcl_gol_world IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 ENDCLASS.
