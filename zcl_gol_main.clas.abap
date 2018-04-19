@@ -22,6 +22,9 @@ CLASS zcl_gol_main DEFINITION
       RETURNING
         VALUE(r_result) TYPE zif_gol_world=>t_state.
     METHODS init_with_random.
+    METHODS get_world
+      RETURNING
+        VALUE(r_result) TYPE REF TO zif_gol_world.
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA:
@@ -33,7 +36,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_gol_main IMPLEMENTATION.
+CLASS ZCL_GOL_MAIN IMPLEMENTATION.
 
 
   METHOD calc_new_state.
@@ -61,6 +64,11 @@ CLASS zcl_gol_main IMPLEMENTATION.
   METHOD get_size.
     e_height = m_max_y.
     e_width = m_max_x.
+  ENDMETHOD.
+
+
+  METHOD get_world.
+    r_result = m_world.
   ENDMETHOD.
 
 

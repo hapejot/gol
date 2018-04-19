@@ -4,20 +4,29 @@ CLASS ltcl_gol DEFINITION FINAL FOR TESTING
   RISK LEVEL HARMLESS.
 
   PRIVATE SECTION.
+    DATA: mo_container TYPE REF TO zcl_abapdi_container,
+          cut          TYPE REF TO zcl_gol_main.
     METHODS main_four FOR TESTING RAISING cx_static_check.
     METHODS birth FOR TESTING RAISING cx_static_check.
     METHODS new_state_alive FOR TESTING RAISING cx_static_check.
     METHODS new_state_birth FOR TESTING RAISING cx_static_check.
+    METHODS setup.
 
 ENDCLASS.
 
 
 CLASS ltcl_gol IMPLEMENTATION.
 
+  METHOD setup.
+    mo_container = NEW zcl_abapdi_container( ).
+    mo_container->register( i_if = 'zif_gol_world' i_cl = 'zcl_gol_world' ).
+    mo_container->register( i_if = 'zcl_gol_settings' i_ob = NEW zcl_gol_settings( i_width = 10 i_height = 10 ) ).
+    cut ?= mo_container->get_instance( 'zcl_gol_main' ).
+  ENDMETHOD.
+
+
   METHOD new_state_alive.
 
-    DATA(world) = CAST zif_gol_world( NEW zcl_gol_world( ) ).
-    DATA(cut) = NEW zcl_gol_main( i_settings = new zcl_gol_settings( i_width = 10 i_height = 10 ) i_world = world ).
     cl_abap_unit_assert=>assert_equals( msg = 'msg'
                             exp = zif_gol_world=>c_alive
                             act = cut->calc_new_state(
@@ -30,8 +39,6 @@ CLASS ltcl_gol IMPLEMENTATION.
 
   METHOD new_state_birth.
 
-    DATA(world) = CAST zif_gol_world( NEW zcl_gol_world( ) ).
-    DATA(cut) = NEW zcl_gol_main( i_settings = new zcl_gol_settings( i_width = 10 i_height = 10 ) i_world = world ).
     cl_abap_unit_assert=>assert_equals( msg = 'msg'
                             exp = zif_gol_world=>c_alive
                             act = cut->calc_new_state(
@@ -44,8 +51,7 @@ CLASS ltcl_gol IMPLEMENTATION.
 
   METHOD main_four.
 
-    DATA(world) = CAST zif_gol_world( NEW zcl_gol_world( ) ).
-    DATA(cut) = NEW zcl_gol_main( i_settings = new zcl_gol_settings( i_width = 10 i_height = 10 ) i_world = world ).
+    DATA(world) = cut->get_world( ).
     world->set_state( x = 3 y = 2 state = abap_true ).
     world->set_state( x = 4 y = 2 state = abap_true ).
     world->set_state( x = 3 y = 3 state = abap_true ).
@@ -63,11 +69,11 @@ CLASS ltcl_gol IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD birth.
-    DATA(world) = CAST zif_gol_world( NEW zcl_gol_world( ) ).
+
+    DATA(world) = cut->get_world( ).
     world->set_state( x = 1 y = 3 state = abap_true ).
     world->set_state( x = 2 y = 3 state = abap_true ).
     world->set_state( x = 3 y = 3 state = abap_true ).
-    DATA(cut) = NEW zcl_gol_main( i_settings = new zcl_gol_settings( i_width = 10 i_height = 10 ) i_world = world ).
     world = cut->main( ).
 
     cl_abap_unit_assert=>assert_equals( msg = 'msg'
