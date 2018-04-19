@@ -4,11 +4,11 @@ CLASS zcl_gol_display DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    INTERFACES zif_gol_display.
     METHODS constructor
       IMPORTING
         i_world TYPE REF TO zif_gol_world
         i_main  TYPE REF TO zcl_gol_main.
-    METHODS display.
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA:
@@ -42,8 +42,29 @@ CLASS zcl_gol_display IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD display.
+  METHOD handle_finished.
 
+    ADD 1 TO m_count.
+    CALL METHOD cl_gui_cfw=>set_new_ok_code
+      EXPORTING
+        new_code = 'REFR'.
+
+  ENDMETHOD.
+
+
+  METHOD zif_gol_display~at_user_command.
+    sy-lsind = sy-lsind - 1.
+    zif_gol_display~display( ).
+  ENDMETHOD.
+
+
+  METHOD zif_gol_display~start_of_selection.
+
+    m_main->init_with_random( ).
+    zif_gol_display~display( ).
+
+  ENDMETHOD.
+  METHOD zif_gol_display~display.
     GET TIME STAMP FIELD DATA(ts0).
     DATA(lr_world) = m_main->main( ).
 
@@ -64,13 +85,4 @@ CLASS zcl_gol_display IMPLEMENTATION.
 
   ENDMETHOD.
 
-
-  METHOD handle_finished.
-
-    ADD 1 TO m_count.
-    CALL METHOD cl_gui_cfw=>set_new_ok_code
-      EXPORTING
-        new_code = 'REFR'.
-
-  ENDMETHOD.
 ENDCLASS.
