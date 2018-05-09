@@ -18,7 +18,13 @@ INITIALIZATION.
   go_display ?= go_container->get_instance( 'zif_gol_display' ).
 
 START-OF-SELECTION.
+  SET PF-STATUS 'MAIN'.
   go_display->start_of_selection( ).
 
 AT USER-COMMAND.
-  go_display->at_user_command( ).
+  CASE sy-ucomm.
+    WHEN 'EXIT'.
+      LEAVE TO SCREEN 0.
+    WHEN OTHERS.
+      go_display->at_user_command( ).
+  ENDCASE.
